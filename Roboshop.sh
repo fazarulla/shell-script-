@@ -23,7 +23,7 @@ do insdent_ID= &( aws ec2 run-instances \
           aws ec2 describe-instances \
          --instance-ids $insdent_ID \
          --query 'Reservations[*].Instances[*].PrivateIpAddress' \
-         --output text 
+         --output text )
      fi
 
 done
