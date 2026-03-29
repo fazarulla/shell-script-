@@ -7,7 +7,8 @@ do insdent_ID=$( aws ec2 run-instances \
     --instance-type "t3.micro" \
     --security-group-ids $SG_ID\
     --query 'Reservations[].Instances[].PublicIpAddress' \
-    --output 'text' )
+    --output text
+     )
 
     if [ $instance == "frontend" ]; then
         IP=$(
@@ -21,7 +22,8 @@ do insdent_ID=$( aws ec2 run-instances \
           aws ec2 describe-instances \
          --instance-ids $insdent_ID \
          --query 'Reservations[].Instances[].PrivateIpAddress' \
-         --output 'text' )
+         --output text
+          )
      fi
      echo "Ip address $IP"
 
