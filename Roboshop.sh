@@ -26,5 +26,4 @@ do insdent_ID=$( aws ec2 run-instances \
          )
      fi
      echo "Ip address $IP"
-
 done
