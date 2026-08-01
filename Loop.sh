@@ -22,6 +22,14 @@ VALIDATE(){
 for package in $@
 
 do
-  dnf install $package -y &>> $LOG_FILE
-  VALIDATE $? "$package installtion" 
+
+  dnf list install $package &>> $LOG_FILE
+  if [ $? ne 0 ]; then
+     echo "$package not installed"
+
+
+     dnf install $package -y &>> $LOG_FILE
+     VALIDATE $? "$package installtion" 
+    else "$package already installed, skip "
+   fi
 done
