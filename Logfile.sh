@@ -5,7 +5,7 @@ LOG_FILE="/var/log/shell-script/$0.log"
 
 if [$USERID -ne 0 ]; then
     echo "Please run this script with root user"
-    exit1
+    exit 1
 fi
 
 mkdir -p $LOG_FOLDER
@@ -13,7 +13,7 @@ mkdir -p $LOG_FOLDER
 VALIDATE(){
     if [ $1 -ne 0 ]; then
     echo " $2... FAILUER"
-    exit1
+    exit 1
     echo "$2... SUCCESS"
     fi
 }
