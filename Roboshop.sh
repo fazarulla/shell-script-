@@ -1,29 +1,29 @@
 #!/bin/bash
-SG_ID=sg-016b62a93da4cccb5
-AMI_ID=ami-0220d79f3f480ecf5
-for instance in $@
-do insdent_ID=$( aws ec2 run-instances \
-    --image-id $AMI_ID \
-    --instance-type "t3.micro" \
-    --security-group-ids $SG_ID\
-    --query 'Reservations[].Instances[].PublicIpAddress' \
-    --output text
-     )
+USERID=$(id -u)
+LOG_FOLDER="/var/log/shell-script"
+LOG_FILE="/var/log/shell-script/$0.log"
 
-    if [ $instance == "frontend" ]; then
-        IP=$(
-           aws ec2 describe-instances \
-         --instance-ids $instant_ID \
-         --query 'Reservations[].Instances[].PublicIpAddress' \
-         --output text 
-            ) 
-   else 
-        IP=$(
-          aws ec2 describe-instances \
-         --instance-ids $insdent_ID \
-         --query 'Reservations[].Instances[].PrivateIpAddress' \
-         --output text
-         )
-     fi
-     echo "Ip address $IP"
-done
+if [$USERID -ne 0 ]; then
+    echo "Please run this script with root user"
+    exit1
+fi
+
+mkdir -p $LOG_FOLDER
+
+VALIDATE(){
+    if [ $1 -ne 0 ]; then
+    echo " $2... FAILUER"
+    exit1
+    echo "$2... SUCCESS"
+    fi
+}
+
+dnf install nginex -y &>>  $LOG_FILE
+VALIDATE $? "Installing Nginx"
+
+dnf install nginex -y &>>  $LOG_FILE
+VALIDATE $? "Installing Mysql"
+
+
+dnf install nginex -y &>>  $LOG_FILE
+VALIDATE $? "Installing nodejs"
