@@ -3,11 +3,10 @@ SG_ID="sg-0718c2c4c36982ff9"
 AMI_ID="ami-0220d79f3f480ecf5"
 
 for Instance in $@
-
 do
-   Instance_Id = $( aws ec2 run-instances \
+   instance_Id = $( aws ec2 run-instances \
     --image-id $AMI_ID \
-    --instance-type t3.micro \
+    --instance-type "t3.micro" \
     --security-group-ids $SG_ID \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Environment,Value=$instance}]"\
     --query 'Instances[0].InstanceId' \
