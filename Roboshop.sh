@@ -23,7 +23,8 @@ do
         IP= $(aws ec2 describe-instances \
             --instance-ids $Instance_Id \
             --query 'Reservations[].Instances[]. PrivateIpAddress' \
-            --output text)               
+            --output text)
+    fi               
 done
 
 
