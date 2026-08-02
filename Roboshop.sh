@@ -10,8 +10,7 @@ do
     --security-group-ids $SG_ID \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Environment,Value=$instance}]"\
     --query 'Instances[0].InstanceId' \
-    --output text 
-    )
+    --output text )
     
     if [ $instance ==  "frontend" ]; then
         IP=$( 
@@ -28,7 +27,6 @@ do
             --output text 
         )
     fi 
-    
     echo "IP Address: $IP"              
 done
 
