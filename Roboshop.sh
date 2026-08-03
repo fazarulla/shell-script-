@@ -21,7 +21,7 @@ do
             --query 'Reservations[].Instances[].PublicIpAddress' \
             --output text 
         )
-        RECORD_NAME="$DOMAINNAME"
+        RECORD_NAME="$DOMAIN_Name"
     else
         IP=$( 
             aws ec2 describe-instances \
@@ -29,12 +29,12 @@ do
             --query 'Reservations[].Instances[].PrivateIpAddress' \
             --output text 
         )
-         RECORD_NAME="$instance.$DOMAINNAME"
+         RECORD_NAME="$instance.$DOMAIN_Name"
     fi 
     echo "IP Address: $IP" 
 
     aws route53 change-resource-record-sets \
-    --hosted-zone-id "$Zone" \
+    --hosted-zone-id "$ZONE_ID" \
     --change-batch '
         {
     "Comment": "Updating resource record set",
@@ -54,11 +54,9 @@ do
         }
     ]
     }
-'
-    
-
-
-             
+    '
+    echo "DNS record Update for $instance"
+              
 done
 
 
