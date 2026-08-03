@@ -16,10 +16,10 @@ mkdir -p $LOG_FOLDER
 
 VALIDATE(){
     if [ $1 -ne 0 ]; then
-    echo "$2... FAILUER" | tee -a $LOG_FILE
+    echo "$2... $R FAILUER $N" | tee -a $LOG_FILE
     exit 1
     else
-    echo "$2... SUCCESS" | tee -a $LOG_FILE
+    echo "$2... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
 
@@ -39,4 +39,4 @@ sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
 VALIDATE $? "Allowing Remote connections"
 
 systemctl restart mongod
-VALIDATE $? "Restart service"
+VALIDATE $? "Restart MongoDB"
