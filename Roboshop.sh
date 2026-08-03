@@ -1,6 +1,8 @@
 #!/bin/bash
 SG_ID="sg-0718c2c4c36982ff9"
 AMI_ID="ami-0220d79f3f480ecf5"
+ZONE_ID="Z04148293H4QLTC84JQWN"
+DOMAIN_Name='fazarulla.online'
 
 for instance in $@
 do
@@ -19,6 +21,7 @@ do
             --query 'Reservations[].Instances[].PublicIpAddress' \
             --output text 
         )
+        RECORD_NAME="$DOMAINNAME"
     else
         IP=$( 
             aws ec2 describe-instances \
@@ -26,10 +29,37 @@ do
             --query 'Reservations[].Instances[].PrivateIpAddress' \
             --output text 
         )
+         RECORD_NAME="$instance.$DOMAINNAME"
     fi 
-    echo "IP Address: $IP"              
-done
+    echo "IP Address: $IP" 
 
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id "$Zone" \
+    --change-batch '
+        {
+    "Comment": "Updating resource record set",
+    "Changes": [
+        {
+        "Action": "UPSERT",
+        "ResourceRecordSet": {
+            "Name": "'$RECORD_NAME'",
+            "Type": "A",
+            "TTL": 1,
+            "ResourceRecords": [
+            {
+                "Value": "'$IP'"
+            }
+            ]
+        }
+        }
+    ]
+    }
+'
+    
+
+
+             
+done
 
 
 
