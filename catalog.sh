@@ -58,9 +58,9 @@ unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "Unzip package code"
 
 
-cd /app 
-npm install 
-VALIDATE $"installing dependencies"
+ 
+npm install &>>$LOG_FILE 
+VALIDATE $? "installing dependencies"
 
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
 VALIDATE $? "created systemctl service"
@@ -68,7 +68,7 @@ VALIDATE $? "created systemctl service"
 systemctl daemon-reload
 systemctl enable catalogue &>>$LOG_FILE
 systemctl start catalogue 
-VALIDATE "stsrtin & enabling catatalogue"
+VALIDATE "startin & enabling catatalogue"
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 
