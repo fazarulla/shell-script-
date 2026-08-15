@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 USERID=$(id -u)
 LOG_FOLDER="/var/log/shell-Roboshop"
 LOG_FILE="/var/log/shell-Roboshop/$0.log"
