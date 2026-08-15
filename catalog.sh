@@ -51,7 +51,7 @@ VALIDATE $? " Downloading Catalog app"
 
 cd /app
 VALIDATE $?"moving to app directory"
-rm /app/*
+rm -rf /app/*
 VALIDATE "removing existing code"
 
 unzip /tmp/catalogue.zip &>>$LOG_FILE
@@ -62,7 +62,7 @@ cd /app
 npm install 
 VALIDATE $"installing dependencies"
 
-cp $SCRIPT_DIR/catalogue.service /etc/sysstemd/system/catalogue.service &>>$LOG_FILE
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
 VALIDATE $? "created systemctl service"
 
 systemctl daemon-reload
