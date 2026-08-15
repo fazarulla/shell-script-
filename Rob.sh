@@ -1,41 +1,65 @@
 #!/bin/bash
 
-SG_ID="sg-016b62a93da4cccb5"
+#!/bin/bash
+
+SG_ID="sg-0718c2c4c36982ff9"
 AMI_ID="ami-0220d79f3f480ecf5"
+ZONE_ID="Z04148293H4QLTC84JQWN"
+DOMAIN_Name='fazarulla.online'
 
-# List of instance roles you want to create
-INSTANCES=("frontend" "backend" "database")
+for instance in $@
+do
+    INSTANCE_ID=$( aws ec2 run-instances \
+    --image-id $AMI_ID \
+    --instance-type "t3.micro" \
+    --security-group-ids $SG_ID \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
+    --query 'Instances[0].InstanceId' \
+    --output text )
 
-for instance in "${INSTANCES[@]}"; do
-    echo "Launching $instance ..."
-
-    # Launch the EC2 instance
-    instance_ID=$(aws ec2 run-instances \
-        --image-id "$AMI_ID" \
-        --instance-type "t3.micro" \
-        --security-group-ids "$SG_ID" \
-        --query 'Instances[0].InstanceId' \
-        --output text)
-
-    echo "$instance launched with Instance ID: $instance_ID"
-    echo "Waiting for instance to enter 'running' state..."
-    
-    aws ec2 wait instance-running --instance-ids "$instance_ID"
-
-    # Determine whether to retrieve Public or Private IP
-    if [[ "$instance" == "frontend" ]]; then
-        IP=$(aws ec2 describe-instances \
-            --instance-ids "$instance_ID" \
-            --query 'Reservations[0].Instances[0].PublicIpAddress' \
-            --output text)
+    if [ $instance == "frontend" ]; then
+        IP=$(
+            aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query 'Reservations[].Instances[].PublicIpAddress' \
+            --output text
+        )
+        RECORD_NAME="$DOMAIN_NAME" # daws88s.online
     else
-        IP=$(aws ec2 describe-instances \
-            --instance-ids "$instance_ID" \
-            --query 'Reservations[0].Instances[0].PrivateIpAddress' \
-            --output text)
+        IP=$(
+            aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query 'Reservations[].Instances[].PrivateIpAddress' \
+            --output text
+        )
+        RECORD_NAME="$instance.$DOMAIN_NAME" # mongodb.daws88s.online
     fi
 
-    echo "$instance IP Address: $IP"
-    echo "----------------------------------"
+    echo "IP Address: $IP"
+
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Updating record",
+        "Changes": [
+            {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "'$RECORD_NAME'",
+                "Type": "A",
+                "TTL": 1,
+                "ResourceRecords": [
+                {
+                    "Value": "'$IP'"
+                }
+                ]
+            }
+            }
+        ]
+    }
+    '
+
+    echo "record updated for $instance"
 
 done
