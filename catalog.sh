@@ -6,6 +6,8 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+SCRIPT_DIR=$PWD
+MONGODB_host=mongodb.fazarulla.online
 
 if [ $USERID -ne 0 ]; then
     echo "Please run this script with root user access" | tee -a $LOG_FILE
@@ -49,19 +51,40 @@ VALIDATE $? " Downloading Catalog app"
 
 cd /app
 VALIDATE $?"moving to app directory"
+rm /app/*
+VALIDATE "removing existing code"
 
-unzip /tmp/catalogue.zip
-VALIDATE $? "Unzip package"
+unzip /tmp/catalogue.zip &>>$LOG_FILE
+VALIDATE $? "Unzip package code"
+
 
 cd /app 
 npm install 
+VALIDATE $"installing dependencies"
 
-cp  catalogue.service /etc/sysstemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.service /etc/sysstemd/system/catalogue.service &>>$LOG_FILE
 VALIDATE $? "created systemctl service"
 
 systemctl daemon-reload
-
-systemctl enable catalogue 
-systemctl start catalogue
+systemctl enable catalogue &>>$LOG_FILE
+systemctl start catalogue 
 VALIDATE "stsrtin & enabling catatalogue"
+
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
+
+dnf install mongodb-mongosh -y &>>$LOG_FILE
+
+
+
+INDEX=$(mongosh --host $MONGODB_host --quiet  --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+
+if [ $INDEX -le 0 ]; then
+    mongosh --host $MONGODB_host </app/db/master-data.js
+    VALIDATE $? "Loading products"
+else
+    echo -e "Products already loaded ... $Y SKIPPING $N"
+fi
+
+systemctl restart catalogue
+VALIDATE $? "Restarting catalogue"
 
