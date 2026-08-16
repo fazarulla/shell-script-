@@ -30,8 +30,10 @@ validate $? "Enabling Redis 7 module" &>>LOG_FILE
 
 dnf install redis -y &>>LOG_FILE
 validate $? "Installing Redis" &>>LOG_FILE
+
 sed -i -e 's/127.0.0.1/0.0.0.0/g' -e '/protected-mode/ c protected-mode/ no' /etc/redis/redis.conf
-validate $? "Updating Redis Config" &>>LOG_FILE
+validate $? "Allowing remote connection" 
+
 systemctl enable redis &>>LOG_FILE
 systemctl start redis 
 validate $? "Enabling& Starting Redis Service"
